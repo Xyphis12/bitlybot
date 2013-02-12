@@ -83,10 +83,17 @@ while 1: # Be careful with these! It might send you to an infinite loop
   if ircmsg.find(' PRIVMSG ')!=-1:
        nick=ircmsg.split('!')[0][1:]
        channel=ircmsg.split(' PRIVMSG ')[-1].split(' :')[0]
+<<<<<<< HEAD
        try:
           commands(nick,channel,ircmsg)
        except:
           pass
+=======
+  try:     
+       commands(nick,channel,ircmsg)
+  except:
+       pass
+>>>>>>> experimental
   if ircmsg.find(":Hello "+ botnick) != -1: # If we can find "Hello Mybot" it will call the function hello()
     hello()
   if ircmsg.find("PING :") != -1: # if the server pings us then we've got to respond!
