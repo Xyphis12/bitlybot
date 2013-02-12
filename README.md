@@ -1,8 +1,9 @@
-bitlybot
+Bitly-Bot
 ========
 
-IRC Bot that can interface with bitly.
+Bitly-Bot is an IRC Bot that can interface with bitly.
 
 This bot has 2 dependencies:
-bitly  http://code.google.com/p/python-bitly/
-beautifulsoup  http://www.crummy.com/software/BeautifulSoup/
+bitly  <a href="http://code.google.com/p/python-bitly/">http://code.google.com/p/python-bitly/</a><br>beautifulsoup  <a href="http://www.crummy.com/software/BeautifulSoup/">http://www.crummy.com/software/BeautifulSoup/
+<br><br>
+To use bitly, you must have an API key, you can get one at <a href="http://dev.bitly.com/">http://dev.bitly.com/</a>
