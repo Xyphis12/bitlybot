@@ -42,8 +42,14 @@ def sendmsg(chan , msg): # This is the send message function, it simply sends me
 def joinchan(chan): # This function is used to join channels.
   ircsock.send("JOIN "+ chan +"\n")
 
-def hello(nick): # This function responds to a user that inputs "Hello Mybot"
+###################################################3####
+# not sure if this really is working like it should fix it
+######################################################3
+
+def hello(whonick): # This function responds to a user that inputs "Hello Mybot"
   ircsock.send("PRIVMSG "+ channel +" :Hello!\n")
+
+########################################################3#
 
 def find_urls(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
@@ -80,6 +86,6 @@ while 1: # Be careful with these! It might send you to an infinite loop
       except:
          pass #this skips the error instead of doing anything about it
   if ircmsg.find(":Hello "+ botnick) != -1: # If we can find "Hello Mybot" it will call the function hello()
-    hello()
+    hello(nick)
   if ircmsg.find("PING :") != -1: # if the server pings us then we've got to respond!
     ping()
