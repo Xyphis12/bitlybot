@@ -3,9 +3,14 @@ import socket
 import re
 import urllib2
 import bitly
+#import urllib
 from bs4 import BeautifulSoup
-# import urllib
-# Some basic variables used to configure the bot
+
+
+###################################################################################################
+#########################################  VARIABLES  #############################################
+###################################################################################################
+
 api = bitly.Api(login='dtalley11', apikey='R_86a5369316becf81898a9af33108495d') # bitly information
 server = "hubbard.freenode.net" # Server
 channel = "#teamgelato" # Channel
@@ -13,44 +18,61 @@ botnick = "iBrobot" # Your bots nick
 pref = "!" #Command Prefix
 port = 6666 #Port used to connect with
 
-def visible(element):
-      if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
-         return False
-      elif re.match('', unicode(element)): return False
-      elif re.match('\n', unicode(element)): return False
-      return True
+###################################################################################################
+###################################################################################################
 
+###FUNCTIONS###
+
+def visible(element):
+  if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
+    return False
+  elif re.match('', unicode(element)): return False
+  elif re.match('\n', unicode(element)): return False
+  return True
+
+
+#what to do when commands are submitted e.g. !talk
 def commands(nick,channel,message):
    if message.find("http")!=-1:
       find_urls(nick,channel,message)
    elif message.find("www")!=-1:
       find_urls(nick,channel,message)
+  # elif message.find("trash")!=-1:
+     # ircsock.send("PRIVMSG "+ channel +" :"+ nick +" gets a foobar! woohoo!\n")
 
+
+#ctcp version request answer from the bot
 def version(nick):
    if message.find("VERSION")!=-1:
       ircsock.send('NOTICE : '+nick+' IRC BOT \n')
 
-def ping(): # This is our first function! It will respond to server Pings.
+
+#This is a must function! It will respond to server Pings and keep bot connected.
+def ping():
   ircsock.send("PONG :Pong\n")
 
-def sendmsg(chan , msg): # This is the send message function, it simply sends messages to the channel.
+
+# This is the send message function, it simply sends messages to the channel.
+def sendmsg(chan , msg):
   ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n")
 
-def sendmsg(chan , msg): # This is the send message function, it simply sends messages to the channel.
-  ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n")
 
-def joinchan(chan): # This function is used to join channels.
+# This function is used to join channels.
+def joinchan(chan):
   ircsock.send("JOIN "+ chan +"\n")
 
-###################################################3####
-# not sure if this really is working like it should fix it
-######################################################3
 
-def hello(whonick): # This function responds to a user that inputs "Hello Mybot"
-  ircsock.send("PRIVMSG "+ channel +" :Hello!\n")
+#This function responds to a user that inputs "Hello Mybot"
+def hello(nick):
+  ircsock.send("PRIVMSG "+ channel +" :Hello "+ nick +"!\n")
 
-########################################################3#
 
+#random function to trash talk picked person
+def trash(who):
+  ircsock.send("PRIVMSG "+ channel +"Shut up. You've been warned"+ who +"\n")
+
+
+#finds urls in chat and processes them for bit.ly links
 def find_urls(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
@@ -78,6 +100,7 @@ while 1: # Be careful with these! It might send you to an infinite loop
   ircmsg = ircsock.recv(2048) # receive data from the server
   ircmsg = ircmsg.strip('\n\r') # removing any unnecessary linebreaks.
   print(ircmsg) # Here we print what's coming from the server
+  
   if ircmsg.find(' PRIVMSG ')!=-1:
       nick=ircmsg.split('!')[0][1:]
       channel=ircmsg.split(' PRIVMSG ')[-1].split(' :')[0]
@@ -85,7 +108,9 @@ while 1: # Be careful with these! It might send you to an infinite loop
          commands(nick,channel,ircmsg)
       except:
          pass #this skips the error instead of doing anything about it
-  if ircmsg.find(":Hello "+ botnick) != -1: # If we can find "Hello Mybot" it will call the function hello()
-    hello(nick)
+  
+  if ircmsg.find(":Hello "+ botnick) != -1: # If can find "Hello Mybot" it will call the function hello()
+      hello(nick)
+  
   if ircmsg.find("PING :") != -1: # if the server pings us then we've got to respond!
-    ping()
+      ping()
