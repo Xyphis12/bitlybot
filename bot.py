@@ -1,4 +1,5 @@
 # Import some necessary libraries.
+import sys
 import socket
 import re
 import urllib2
@@ -94,12 +95,12 @@ def find_urls_http(nick,channel,message):
 def find_urls_www(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
-    url_list = re.findall("([wW]{3}.[A-Za-z0-9_]{2,3}.*)",message) #look for url wiht www* on the address
+    url_list = re.findall("(\b[wW]{3}.[A-Za-z0-9_]{2,3}.*\b)",message) #look for url wiht www* on the address
     short = api.shorten(url_list) #send url to api
     site = ''.join(url_list) #join list of urls from chat
     shortstr = ''.join(short) # Join list of urls from bitly
     content = urllib2.urlopen(site).read()
-    soup = BeautifulSoup(conte
+    soup = BeautifulSoup(content)
     titl = soup.title.string
     texts = soup.findAll(text=True)
     visible_texts = filter(visible, texts)
@@ -107,7 +108,11 @@ def find_urls_www(nick,channel,message):
     ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
     ircsock.send('PRIVMSG %s :%s - %s\r\n' % (channel,titl,det))#print out url
 
-
+'''
+#function for terminating the bot remotely for whatever reason only has owner access
+def exit(command):
+    if (command == 'exit')
+'''
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ircsock.connect((server, port)) # Here we connect to the server using port 6667
 ircsock.send("USER "+ botnick +" "+ botnick +" "+ botnick +" :Hey\n") # user authentication
@@ -128,8 +133,8 @@ while 1: # Be careful with these! It might send you to an infinite loop
       except:
          pass #this skips the error instead of doing anything about it
   
-  if ircmsg.find(":Hello "+ botnick) != -1: # If can find "Hello Mybot" it will call the function hello()
-      hello(nick)
+  if ircmsg.find(":!exit") != -1:
+      sys.exit(0)
   
   if ircmsg.find("PING :") != -1: # if the server pings us then we've got to respond!
       ping()
