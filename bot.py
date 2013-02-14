@@ -34,9 +34,9 @@ def visible(element):
 #what to do when commands are submitted e.g. !talk
 def commands(nick,channel,message):
    if message.find("http")!=-1:
-      find_urls(nick,channel,message)
+      find_urls_http(nick,channel,message)
    elif message.find("www")!=-1:
-      find_urls(nick,channel,message)
+      find_urls_www(nick,channel,message)
   # elif message.find("trash")!=-1:
      # ircsock.send("PRIVMSG "+ channel +" :"+ nick +" gets a foobar! woohoo!\n")
 
@@ -72,11 +72,11 @@ def trash(who):
   ircsock.send("PRIVMSG "+ channel +"Shut up. You've been warned"+ who +"\n")
 
 
-#finds urls in chat and processes them for bit.ly links
-def find_urls(nick,channel,message):
+#finds http* urls in chat and processes them for bit.ly links
+def find_urls_http(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
-    url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url
+    url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url wiht http* on the address
     short = api.shorten(url_list) #send url to api
     site = ''.join(url_list) #join list of urls from chat
     shortstr = ''.join(short) # Join list of urls from bitly
@@ -88,6 +88,35 @@ def find_urls(nick,channel,message):
     det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts
     ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
     ircsock.send('PRIVMSG %s :%s - %s\r\n' % (channel,titl,det))#print out url
+
+
+#find www* urls and process with bit.ly
+def find_urls_www(nick,channel,message):
+    """ Extract all URL's from a string & return as a list """
+
+    print 'going to find url'
+    url_list = re.findall("([W]{3}.*\.*)",message) #look for url wiht www* on the address
+    print 'shortening api called'
+    message = "http://"+ message
+    short = api.shorten(url_list) #send url to api
+    print 'joining lists'
+    site = ''.join(url_list) #join list of urls from chat
+    print 'short list of urls'
+    shortstr = ''.join(short) # Join list of urls from bitly
+    print 'called urllib2'
+    content = urllib2.urlopen(site).read()
+    print 'send them to soup'
+    soup = BeautifulSoup(content)
+    print 'set title tag'
+    titl = soup.title.string
+    print 'found all liks in soup'
+    texts = soup.findAll(text=True)
+    print 'text is visibile'
+    visible_texts = filter(visible, texts)
+    det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts
+    ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
+    ircsock.send('PRIVMSG %s :%s - %s\r\n' % (channel,titl,det))#print out url
+
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ircsock.connect((server, port)) # Here we connect to the server using port 6667
