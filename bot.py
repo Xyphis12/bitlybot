@@ -94,24 +94,14 @@ def find_urls_http(nick,channel,message):
 def find_urls_www(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
-    print 'going to find url'
-    url_list = re.findall("([W]{3}.*\.*)",message) #look for url wiht www* on the address
-    print 'shortening api called'
-    message = "http://"+ message
+    url_list = re.findall("([wW]{3}.[A-Za-z0-9_]{2,3}.*)",message) #look for url wiht www* on the address
     short = api.shorten(url_list) #send url to api
-    print 'joining lists'
     site = ''.join(url_list) #join list of urls from chat
-    print 'short list of urls'
     shortstr = ''.join(short) # Join list of urls from bitly
-    print 'called urllib2'
     content = urllib2.urlopen(site).read()
-    print 'send them to soup'
-    soup = BeautifulSoup(content)
-    print 'set title tag'
+    soup = BeautifulSoup(conte
     titl = soup.title.string
-    print 'found all liks in soup'
     texts = soup.findAll(text=True)
-    print 'text is visibile'
     visible_texts = filter(visible, texts)
     det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts
     ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
