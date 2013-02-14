@@ -5,13 +5,13 @@ import urllib2
 import bitly
 #import urllib
 from bs4 import BeautifulSoup
-
+import info #file with login variables in it (info.py)
 
 ###################################################################################################
 #########################################  VARIABLES  #############################################
 ###################################################################################################
 
-api = bitly.Api(login='dtalley11', apikey='R_86a5369316becf81898a9af33108495d') # bitly information
+api = bitly.Api(login=info.login, apikey=info.key) # bitly information
 server = "hubbard.freenode.net" # Server
 channel = "#teamgelato" # Channel
 botnick = "iBrobot" # Your bots nick
