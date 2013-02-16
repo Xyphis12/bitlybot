@@ -8,19 +8,29 @@ import bitly
 from bs4 import BeautifulSoup
 import info #file with login variables in it (info.py)
 
-###################################################################################################
-#########################################  VARIABLES  #############################################
-###################################################################################################
+''' SETUP
+
+- NEEDS AN INFO.PY FILE WITH THE FOLLOW LINES:
+
+login=*login to bitly account*
+apikey=*api key to server*
+owner=*irc nickname of bot owner*
+botnick=*preferred nicname of bot*
+'''
+
+################################################################################
+################################### VARIABLES  #################################
+################################################################################
 
 api = bitly.Api(login=info.login, apikey=info.key) # bitly information
 server = "hubbard.freenode.net" # Server
 channel = "#teamgelato" # Channel
-botnick = "iBrobot" # Your bots nick
+botnick = 'iBrobot' # Your bots nick
 pref = "!" #Command Prefix
 port = 6666 #Port used to connect with
 
-###################################################################################################
-###################################################################################################
+################################################################################
+################################################################################
 
 ###FUNCTIONS###
 
@@ -95,9 +105,12 @@ def find_urls_http(nick,channel,message):
 def find_urls_www(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
-    url_list = re.findall("(\b[wW]{3}.[A-Za-z0-9_]{2,3}.*\b)",message) #look for url wiht www* on the address
+    url_list = re.findall("\b:([Ww]{3}\.*\.[A-Za-z]{2,3}\.)\b",message) #look for url www* on the address
+    print url_list
     short = api.shorten(url_list) #send url to api
+    print short
     site = ''.join(url_list) #join list of urls from chat
+    print site
     shortstr = ''.join(short) # Join list of urls from bitly
     content = urllib2.urlopen(site).read()
     soup = BeautifulSoup(content)
@@ -128,7 +141,7 @@ while 1: # Be careful with these! It might send you to an infinite loop
   if ircmsg.find(' PRIVMSG ')!=-1:
       nick=ircmsg.split('!')[0][1:]
       channel=ircmsg.split(' PRIVMSG ')[-1].split(' :')[0]
-      try: #kind of like an 'if' but if there is an error it can do something about it
+      try: #find error in case the command throws an exception
          commands(nick,channel,ircmsg)
       except:
          pass #this skips the error instead of doing anything about it
