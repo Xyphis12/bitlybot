@@ -11,13 +11,16 @@ from bs4 import BeautifulSoup
 #########################################  VARIABLES  #############################################
 ###################################################################################################
 
-api = bitly.Api(login='dtalley11', apikey='R_86a5369316becf81898a9af33108495d') # bitly information
-server = "hubbard.freenode.net" # Server
-channel = "#teamgelato" # Channel
-botnick = "iBrobot" # Your bots nick
+server = "irc.someserver.net" # Server
+channel = "#somechan" # Channel
+botnick = "somenick" # Your bots nick
 pref = "!" #Command Prefix
 port = 6666 #Port used to connect with
-
+api = bitly.Api(login='bit.ly login',apikey='bit.ly api') # bitly information
+api_key = "some key" #adf.ly key
+uid = 0000000 #adf.ly uid
+domain = 'adf.ly' #adf.ly domain to use
+ad_type = 'int' #Type of ad
 ###################################################################################################
 ###################################################################################################
 
@@ -77,8 +80,13 @@ def find_urls(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
     url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url
-    short = api.shorten(url_list) #send url to api
-    site = ''.join(url_list) #join list of urls from chat
+    url = ''.join(url_list) #join list of urls from chat
+    print url_list
+    adfurl = ("http://adf.ly/%s/%s" % (uid,url))
+    print adfurl
+    short = api.shorten(adfurl) #send url to api
+    print short
+    site = url #join list of urls from chat
     shortstr = ''.join(short) # Join list of urls from bitly
     content = urllib2.urlopen(site).read()
     soup = BeautifulSoup(content)
