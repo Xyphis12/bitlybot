@@ -1,0 +1,9 @@
+#bit.ly bot setup.txt
+#Fill this out with you bot's information
+
+
+
+apilogin = 'yourusername' #replace yourusername with your bit.ly username
+apikey = 'bit.ly key' #replace with your bitly api key
+owner = 'owner's username' #replace with owners username
+botnick = 'botnick' #replace wich prefered nickname

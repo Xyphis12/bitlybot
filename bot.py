@@ -4,13 +4,12 @@ import socket
 import re
 import urllib2
 import bitly
-#import urllib
 from bs4 import BeautifulSoup
-import info #file with login variables in it (info.py)
-
+# import info #file with login variables in it (info.py)
+execfile('setup.txt')
 ''' SETUP
 
-- NEEDS AN INFO.PY FILE WITH THE FOLLOW LINES:
+- NEEDS AN setup.txt FILE WITH THE FOLLOW LINES:
 
 login=*login to bitly account*
 apikey=*api key to server*
@@ -25,7 +24,7 @@ botnick=*preferred nicname of bot*
 api = bitly.Api(login=info.login, apikey=info.key) # bitly information
 server = "hubbard.freenode.net" # Server
 channel = "#teamgelato" # Channel
-botnick = 'iBrobot' # Your bots nick
+#botnick = 'iBrobot' # Your bots nick
 pref = "!" #Command Prefix
 port = 6666 #Port used to connect with
 
