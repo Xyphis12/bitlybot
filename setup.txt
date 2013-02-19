@@ -1,9 +1,13 @@
-#bit.ly bot setup.txt
-#Fill this out with you bot's information
+################################################
+### bitlybot setup.txt                       ###
+### this is read by the bot.py for variables ###
+################################################
 
-
-
-apilogin = 'yourusername' #replace yourusername with your bit.ly username
-apikey = 'bit.ly key' #replace with your bitly api key
-owner = 'owner's username' #replace with owners username
-botnick = 'botnick' #replace wich prefered nickname
+apilogin = 'usrname' #replace yourusername with your bit.ly username
+apikey = 'R_aplhanumariccode' #replace with your bitly api key
+owner = 'dtalley11' #replace with owners username
+botnick = 'bitlybot' #replace wich prefered nickname
+server = "irc.server.net" # Server
+channel = "#lotsofurls" # Channel
+pref = "!" #Command Prefix
+port = 6666 #Port used to connect with

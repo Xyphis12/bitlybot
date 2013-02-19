@@ -5,31 +5,11 @@ import re
 import urllib2
 import bitly
 from bs4 import BeautifulSoup
-# import info #file with login variables in it (info.py)
-execfile('setup.txt')
-''' SETUP
 
-- NEEDS AN setup.txt FILE WITH THE FOLLOW LINES:
+###SETUP###
+execfile('setup.txt') # import info #file with login variables in it (info.py)
+api = bitly.Api(login=apilogin, apikey=apikey) # bitly information
 
-login=*login to bitly account*
-apikey=*api key to server*
-owner=*irc nickname of bot owner*
-botnick=*preferred nicname of bot*
-'''
-
-################################################################################
-################################### VARIABLES  #################################
-################################################################################
-
-api = bitly.Api(login=info.login, apikey=info.key) # bitly information
-server = "hubbard.freenode.net" # Server
-channel = "#teamgelato" # Channel
-#botnick = 'iBrobot' # Your bots nick
-pref = "!" #Command Prefix
-port = 6666 #Port used to connect with
-
-################################################################################
-################################################################################
 
 ###FUNCTIONS###
 
@@ -46,7 +26,7 @@ def commands(nick,channel,message):
    if message.find("http")!=-1:
       find_urls_http(nick,channel,message)
    elif message.find("www")!=-1:
-      find_urls_www(nick,channel,message)
+      find_urls_http(nick,channel,message)
   # elif message.find("trash")!=-1:
      # ircsock.send("PRIVMSG "+ channel +" :"+ nick +" gets a foobar! woohoo!\n")
 
@@ -86,39 +66,19 @@ def trash(who):
 def find_urls_http(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
-    url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url wiht http* on the address
+    url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url with http* on the address
+    url_list = re.findall("(?P<url>www[^\s]+)",message) #look for url with www* on the address
     short = api.shorten(url_list) #send url to api
     site = ''.join(url_list) #join list of urls from chat
     shortstr = ''.join(short) # Join list of urls from bitly
-    content = urllib2.urlopen(site).read()
-    soup = BeautifulSoup(content)
-    titl = soup.title.string
-    texts = soup.findAll(text=True)
-    visible_texts = filter(visible, texts)
-    det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts
+    content = urllib2.urlopen(site).read() # read the website
+    soup = BeautifulSoup(content) # grab the content
+    titl = soup.title.string # grab title strings
+    #texts = soup.findAll(text=True) #grab text
+    #visible_texts = filter(visible, texts) #make sure its visable 
+    #det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts # stop after 75 chars
     ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
-    ircsock.send('PRIVMSG %s :%s - %s\r\n' % (channel,titl,det))#print out url
-
-
-#find www* urls and process with bit.ly
-def find_urls_www(nick,channel,message):
-    """ Extract all URL's from a string & return as a list """
-
-    url_list = re.findall("\b:([Ww]{3}\.*\.[A-Za-z]{2,3}\.)\b",message) #look for url www* on the address
-    print url_list
-    short = api.shorten(url_list) #send url to api
-    print short
-    site = ''.join(url_list) #join list of urls from chat
-    print site
-    shortstr = ''.join(short) # Join list of urls from bitly
-    content = urllib2.urlopen(site).read()
-    soup = BeautifulSoup(content)
-    titl = soup.title.string
-    texts = soup.findAll(text=True)
-    visible_texts = filter(visible, texts)
-    det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts
-    ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
-    ircsock.send('PRIVMSG %s :%s - %s\r\n' % (channel,titl,det))#print out url
+    ircsock.send('PRIVMSG %s :%s\r\n' % (channel,titl))#print out url
 
 '''
 #function for terminating the bot remotely for whatever reason only has owner access
