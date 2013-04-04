@@ -3,11 +3,11 @@ import sys
 import socket
 import re
 import urllib2
-import bitly
+from bitly import bitly
 from bs4 import BeautifulSoup
 
-###SETUP###
-execfile('setup.txt') # import info #file with login variables in it (info.py)
+###CONFIG###
+execfile('config.txt') # import info #file with login variables in it (info.py)
 api = bitly.Api(login=apilogin, apikey=apikey) # bitly information
 
 
@@ -67,31 +67,26 @@ def find_urls_http(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
     url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url with http* on the address
-    url_list = re.findall("(?P<url>www[^\s]+)",message) #look for url with www* on the address
+    url_list2 = re.findall("(?P<url>www[^\s]+)",message) #look for url with www* on the address
+    url_list.extend(url_list2)
     short = api.shorten(url_list) #send url to api
     site = ''.join(url_list) #join list of urls from chat
-    shortstr = ''.join(short) # Join list of urls from bitly
+    shortstr = ' '.join(short) # Join list of urls from bitly
+    ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
     content = urllib2.urlopen(site).read() # read the website
     soup = BeautifulSoup(content) # grab the content
     titl = soup.title.string # grab title strings
-    #texts = soup.findAll(text=True) #grab text
-    #visible_texts = filter(visible, texts) #make sure its visable 
-    #det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts # stop after 75 chars
-    ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
     ircsock.send('PRIVMSG %s :%s\r\n' % (channel,titl))#print out url
 
-'''
-#function for terminating the bot remotely for whatever reason only has owner access
-def exit(command):
-    if (command == 'exit')
-'''
-ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ircsock.connect((server, port)) # Here we connect to the server using port 6667
+###IRC LOGIN###
+ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IRC socket setup
+ircsock.connect((server, port)) # Here we connect to the server using the defined port
 ircsock.send("USER "+ botnick +" "+ botnick +" "+ botnick +" :Hey\n") # user authentication
 ircsock.send("NICK "+ botnick +"\n") # here we actually assign the nick to the bot
 
 joinchan(channel) # Join the channel using the functions we previously defined
 
+###CONNECTION LOOP###
 while 1: # Be careful with these! It might send you to an infinite loop
   ircmsg = ircsock.recv(2048) # receive data from the server
   ircmsg = ircmsg.strip('\n\r') # removing any unnecessary linebreaks.
