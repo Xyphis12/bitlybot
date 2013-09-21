@@ -1,25 +1,15 @@
 # Import some necessary libraries.
+import sys
 import socket
 import re
 import urllib2
-import bitly
-#import urllib
+from bitly import bitly
 from bs4 import BeautifulSoup
 
+###CONFIG###
+execfile('config.txt') # import info #file with login variables in it (info.py)
+api = bitly.Api(login=apilogin, apikey=apikey) # bitly information
 
-###################################################################################################
-#########################################  VARIABLES  #############################################
-###################################################################################################
-
-api = bitly.Api(login='dtalley11', apikey='R_86a5369316becf81898a9af33108495d') # bitly information
-server = "hubbard.freenode.net" # Server
-channel = "#teamgelato" # Channel
-botnick = "iBrobot" # Your bots nick
-pref = "!" #Command Prefix
-port = 6666 #Port used to connect with
-
-###################################################################################################
-###################################################################################################
 
 ###FUNCTIONS###
 
@@ -34,9 +24,9 @@ def visible(element):
 #what to do when commands are submitted e.g. !talk
 def commands(nick,channel,message):
    if message.find("http")!=-1:
-      find_urls(nick,channel,message)
+      find_urls_http(nick,channel,message)
    elif message.find("www")!=-1:
-      find_urls(nick,channel,message)
+      find_urls_http(nick,channel,message)
   # elif message.find("trash")!=-1:
      # ircsock.send("PRIVMSG "+ channel +" :"+ nick +" gets a foobar! woohoo!\n")
 
@@ -72,30 +62,31 @@ def trash(who):
   ircsock.send("PRIVMSG "+ channel +"Shut up. You've been warned"+ who +"\n")
 
 
-#finds urls in chat and processes them for bit.ly links
-def find_urls(nick,channel,message):
+#finds http* urls in chat and processes them for bit.ly links
+def find_urls_http(nick,channel,message):
     """ Extract all URL's from a string & return as a list """
 
-    url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url
+    url_list = re.findall("(?P<url>https?://[^\s]+)",message) #look for url with http* on the address
+    url_list2 = re.findall("(?P<url>www[^\s]+)",message) #look for url with www* on the address
+    url_list.extend(url_list2)
     short = api.shorten(url_list) #send url to api
     site = ''.join(url_list) #join list of urls from chat
-    shortstr = ''.join(short) # Join list of urls from bitly
-    content = urllib2.urlopen(site).read()
-    soup = BeautifulSoup(content)
-    titl = soup.title.string
-    texts = soup.findAll(text=True)
-    visible_texts = filter(visible, texts)
-    det = (dat[:75] + '..') if len(visible_texts) > 75 else visible_texts
+    shortstr = ' '.join(short) # Join list of urls from bitly
     ircsock.send('PRIVMSG %s :%s\r\n' % (channel,shortstr))#print out url
-    ircsock.send('PRIVMSG %s :%s - %s\r\n' % (channel,titl,det))#print out url
+    content = urllib2.urlopen(site).read() # read the website
+    soup = BeautifulSoup(content) # grab the content
+    titl = soup.title.string # grab title strings
+    ircsock.send('PRIVMSG %s :%s\r\n' % (channel,titl))#print out url
 
-ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ircsock.connect((server, port)) # Here we connect to the server using port 6667
+###IRC LOGIN###
+ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IRC socket setup
+ircsock.connect((server, port)) # Here we connect to the server using the defined port
 ircsock.send("USER "+ botnick +" "+ botnick +" "+ botnick +" :Hey\n") # user authentication
 ircsock.send("NICK "+ botnick +"\n") # here we actually assign the nick to the bot
 
 joinchan(channel) # Join the channel using the functions we previously defined
 
+###CONNECTION LOOP###
 while 1: # Be careful with these! It might send you to an infinite loop
   ircmsg = ircsock.recv(2048) # receive data from the server
   ircmsg = ircmsg.strip('\n\r') # removing any unnecessary linebreaks.
@@ -104,13 +95,13 @@ while 1: # Be careful with these! It might send you to an infinite loop
   if ircmsg.find(' PRIVMSG ')!=-1:
       nick=ircmsg.split('!')[0][1:]
       channel=ircmsg.split(' PRIVMSG ')[-1].split(' :')[0]
-      try: #kind of like an 'if' but if there is an error it can do something about it
+      try: #find error in case the command throws an exception
          commands(nick,channel,ircmsg)
       except:
          pass #this skips the error instead of doing anything about it
   
-  if ircmsg.find(":Hello "+ botnick) != -1: # If can find "Hello Mybot" it will call the function hello()
-      hello(nick)
+  if ircmsg.find(":!exit") != -1:
+      sys.exit(0)
   
   if ircmsg.find("PING :") != -1: # if the server pings us then we've got to respond!
       ping()
